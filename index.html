@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page Builder</title>
+    <style>
+        /* === Namespaced styles (lpb-*) to avoid conflicts ===================== */
+        .lpb { --gap: 12px; --radius: 14px; --shadow: 0 6px 30px rgba(0,0,0,.08); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+        .lpb * { box-sizing: border-box; }
+        .lpb-card { max-width: 980px; margin: 24px auto; padding: 20px; background:#fff; border:1px solid #e9ecef; border-radius: var(--radius); box-shadow: var(--shadow); }
+        .lpb-h1 { font-size: 1.6rem; margin: 0 0 10px; }
+        .lpb-h2 { font-size: 1.2rem; margin: 10px 0; }
+        .lpb-h3 { font-size: 1rem; margin: 0; }
+        .lpb-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); }
+        .lpb-field { grid-column: span 12; display: flex; flex-direction: column; gap: 6px; }
+        .lpb-field > label { font-weight: 600; }
+        .lpb-field input[type="text"], .lpb-field textarea, .lpb-field select, .lpb-field input[type="color"] {
+            padding: 10px 12px; border:1px solid #cfd4da; border-radius: 10px; font: inherit; background:#fff;
+        }
+        .lpb-field input[type="color"] { height: 42px; padding: 4px; }
+        .lpb-help { color:#6c757d; }
+        .lpb-row { display:flex; align-items:center; gap:12px; }
+        .lpb-between { justify-content: space-between; }
+        .lpb-check { display:flex; align-items:center; gap:8px; user-select:none; }
+        .lpb-thumb img { display:block; max-width: 260px; max-height: 140px; border-radius:10px; border:1px solid #e9ecef; }
+        .lpb-hr { border:0; height:1px; background:linear-gradient(90deg,#eee,#ddd,#eee); margin:16px 0; }
+        .lpb-actions { display:flex; justify-content:flex-end; gap:10px; margin-top: 16px; }
+        .lpb-btn { border:1px solid #cfd4da; background:#f8f9fa; padding:10px 14px; border-radius: 999px; cursor:pointer; font-weight:600; }
+        .lpb-btn:hover { background:#eff2f5; }
+        .lpb-btn-primary { border-color:#4c6ef5; background:#4c6ef5; color:#fff; }
+        .lpb-btn-primary:hover { filter: brightness(0.95); }
+        .lpb-btn-ghost { background:transparent; }
+        .lpb-sec { padding:12px; border:1px dashed #cfd4da; border-radius: 12px; margin-bottom: 12px; background:#fbfcfe; }
+        .lpb-sec .lpb-row { flex-wrap: wrap; }
+        .lpb-sec .lpb-col { flex:1 1 260px; min-width: 240px; }
+        .lpb-sec .lpb-thumb img { max-width:180px; max-height:120px; }
+        .lpb-sec-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+        .lpb-del { background:#ffe3e3; border-color:#ffa8a8; }
+        .lpb-del:hover { background:#ffc9c9; }
+        .lpb-move { background:#e7f5ff; border-color:#74c0fc; }
+        .lpb-move:hover { background:#d0ebff; }
+
+        /* Modal */
+        .lpb-modal { position: fixed; inset: 0; display:none; z-index: 9999; }
+        .lpb-modal.show { display:block; }
+        .lpb-backdrop { position:absolute; inset:0; background:rgba(0,0,0,.35); }
+        .lpb-modal-card { position:relative; z-index:1; max-width: 980px; margin: 5vh auto; background:#fff; border-radius: 16px; box-shadow: var(--shadow); padding: 16px; border:1px solid #e9ecef; }
+        .lpb-modal-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
+        .lpb-output { width:100%; height: 60vh; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; border:1px solid #e1e4e8; border-radius: 10px; padding: 10px; background:#fafbfc; }
+        .lpb-hint { margin-top: 8px; color:#6c757d; font-size:.9rem; }
+        .lpb-copyright { text-align: center; margin-top: 20px; color: #6c757d; font-size: 0.9rem; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .lpb-footer-btn { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; background: #4c6ef5; color: white; text-decoration: none; border-radius: 999px; font-size: 0.85rem; font-weight: 500; transition: background 0.2s; }
+        .lpb-footer-btn:hover { background: #3b5bdb; }
+        .lpb-footer-btn.paste { background: #fa5252; }
+        .lpb-footer-btn.paste:hover { background: #e03131; }
+        @media (min-width: 700px) {
+            .lpb-field:nth-child(1), .lpb-field:nth-child(2), .lpb-field:nth-child(3) { grid-column: span 6; }
+            .lpb-field:nth-child(4) { grid-column: span 12; }
+        }
+    </style>
+</head>
+<body>
+    <!-- === Landing Page Code Builder (drop-in) ================================ -->
+    <section id="lpb-root" class="lpb">
+        <div class="lpb-card">
+            <h1 class="lpb-h1">Landing Page Builder</h1>
+
+            <div class="lpb-grid">
+                <div class="lpb-field">
+                    <label>Site Title (for browser tab & SEO)</label>
+                    <input id="lpb-site-title" type="text" placeholder="My Awesome Product">
+                </div>
+
+                <div class="lpb-field">
+                    <label>Base Font</label>
+                    <select id="lpb-font">
+                        <option value="system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif">Clean Sans (system)</option>
+                        <option value="Georgia, Times, serif">Serif (Georgia)</option>
+                        <option value="Arial, Helvetica, sans-serif">Arial/Helvetica</option>
+                        <option value="Tahoma, Verdana, sans-serif">Tahoma/Verdana</option>
+                        <option value="'Courier New', Courier, monospace">Monospace</option>
+                        <option value="'Poppins', sans-serif">Poppins (Modern)</option>
+                        <option value="'Montserrat', sans-serif">Montserrat (Clean)</option>
+                        <option value="'Playfair Display', serif">Playfair (Elegant)</option>
+                        <option value="'Roboto Condensed', sans-serif">Roboto Condensed</option>
+                        <option value="'Open Sans', sans-serif">Open Sans (Friendly)</option>
+                        <option value="'Lora', serif">Lora (Elegant)</option>
+                        <option value="'Roboto Mono', monospace">Roboto Mono (Code)</option>
+                        <option value="'Nunito', sans-serif">Nunito (Rounded)</option>
+                        <option value="'Merriweather', serif">Merriweather (Readable)</option>
+                        <option value="'Fira Sans', sans-serif">Fira Sans (Tech)</option>
+                        <option value="'Source Sans Pro', sans-serif">Source Sans Pro (Clean)</option>
+                        <option value="'Oswald', sans-serif">Oswald (Bold)</option>
+                        <option value="'Raleway', sans-serif">Raleway (Elegant)</option>
+                        <option value="'PT Sans', sans-serif">PT Sans (Neutral)</option>
+                        <option value="'Noto Sans', sans-serif">Noto Sans (Universal)</option>
+                    </select>
+                </div>
+
+                <div class="lpb-field">
+                    <label>Base Font Size</label>
+                    <select id="lpb-base-size">
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18" selected>18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="22">22</option>
+                        <option value="24">24</option>
+                        <option value="26">26</option>
+                        <option value="28">28</option>
+                        <option value="30">30</option>
+                    </select>
+                </div>
+
+                <div class="lpb-field lpb-row">
+                    <label class="lpb-check">
+                        <input id="lpb-bold-headings" type="checkbox" checked> Bold Headings
+                    </label>
+                    <label class="lpb-check">
+                        <input id="lpb-bold-body" type="checkbox"> Bold Body Text
+                    </label>
+                </div>
+            </div>
+
+            <hr class="lpb-hr">
+
+            <h2 class="lpb-h2">Color Scheme</h2>
+            <div class="lpb-grid">
+                <div class="lpb-field">
+                    <label>Primary Color</label>
+                    <input id="lpb-primary-color" type="color" value="#4c6ef5">
+                </div>
+                <div class="lpb-field">
+                    <label>Text Color</label>
+                    <input id="lpb-text-color" type="color" value="#1f2937">
+                </div>
+                <div class="lpb-field lpb-row">
+                    <label class="lpb-check">
+                        <input id="lpb-use-gradient" type="checkbox" checked> Use Gradient Background
+                    </label>
+                </div>
+            </div>
+
+            <hr class="lpb-hr">
+
+            <h2 class="lpb-h2">Hero Section</h2>
+            <div class="lpb-grid">
+                <div class="lpb-field">
+                    <label>Hero Heading</label>
+                    <input id="lpb-hero-heading" type="text" placeholder="Build beautiful websites effortlessly">
+                </div>
+                <div class="lpb-field">
+                    <label>Hero Subheading</label>
+                    <textarea id="lpb-hero-sub" rows="2" placeholder="A simple template that becomes real HTML in one click."></textarea>
+                </div>
+                <div class="lpb-field">
+                    <label>Call-To-Action Text</label>
+                    <input id="lpb-hero-cta" type="text" placeholder="Get Started">
+                </div>
+                <div class="lpb-field">
+                    <label>Hero Image (optional)</label>
+                    <input id="lpb-hero-img" type="file" accept="image/*">
+                    <small class="lpb-help">JPG is great; PNG/WebP/GIF also work. We'll embed it directly.</small>
+                    <div id="lpb-hero-thumb" class="lpb-thumb"></div>
+                </div>
+                <div class="lpb-field">
+                    <label>Hero Image Alt Text</label>
+                    <input id="lpb-hero-alt" type="text" placeholder="Screenshot of the product">
+                </div>
+                <div class="lpb-field">
+                    <label>Hero Image Position</label>
+                    <select id="lpb-hero-img-pos">
+                        <option value="right">Right of Text</option>
+                        <option value="below">Below Text</option>
+                        <option value="left">Left of Text</option>
+                        <option value="background">As Background</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr class="lpb-hr">
+
+            <div class="lpb-row lpb-between">
+                <h2 class="lpb-h2">Content Sections</h2>
+                <button id="lpb-add-section" class="lpb-btn">+ Add Section</button>
+            </div>
+            <div id="lpb-sections"></div>
+
+            <div class="lpb-actions">
+                <button id="lpb-generate" class="lpb-btn lpb-btn-primary">Make It Code</button>
+            </div>
+            
+            <div class="lpb-copyright">
+                <span>&copy; Copyright 2025 Titan Business Pros LLC</span>
+                <a href="https://titanbusinesspros.github.io/MooreOklahoma/" class="lpb-footer-btn" target="_blank">Contact</a>
+                <a href="https://titanbusinesspros.github.io/HTMLPlayground1.0/" class="lpb-footer-btn paste" target="_blank">Paste Code</a>
+            </div>
+        </div>
+
+        <!-- Code Modal -->
+        <div id="lpb-modal" class="lpb-modal" aria-hidden="true">
+            <div class="lpb-modal-card" role="dialog" aria-modal="true" aria-labelledby="lpb-modal-title">
+                <div class="lpb-modal-head">
+                    <h3 id="lpb-modal-title" class="lpb-h3">Your Landing Page HTML</h3>
+                    <div class="lpb-modal-actions">
+                        <button id="lpb-copy" class="lpb-btn">Copy</button>
+                        <button id="lpb-minify" class="lpb-btn">Minify</button>
+                        <button id="lpb-close" class="lpb-btn lpb-btn-ghost" aria-label="Close">×</button>
+                    </div>
+                </div>
+                <textarea id="lpb-output" class="lpb-output" rows="16" readonly></textarea>
+                <div class="lpb-hint">Tip: Paste this into a new <code>.html</code> file or your existing project.</div>
+            </div>
+            <div class="lpb-backdrop"></div>
+        </div>
+    </section>
+
+    <script>
+        (function(){
+            const root = document.getElementById('lpb-root');
+            const $ = (sel, par=root) => par.querySelector(sel);
+            const $$ = (sel, par=root) => Array.from(par.querySelectorAll(sel));
+
+            // State
+            const state = {
+                heroImgData: null,
+                heroImgPos: 'right',
+                sections: [] // { id, title, text, imgData, alt, imgPos }
+            };
+
+            // Helpers
+            const escapeHTML = (str='') => str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+            const readFileAsDataURL = file => new Promise((res, rej) => {
+                const fr = new FileReader();
+                fr.onload = () => res(fr.result);
+                fr.onerror = rej;
+                fr.readAsDataURL(file);
+            });
+
+            // Hero image upload
+            $('#lpb-hero-img').addEventListener('change', async (e) => {
+                const f = e.target.files && e.target.files[0];
+                if (!f) return;
+                if (!/^image\//.test(f.type)) { alert('Please choose an image file.'); e.target.value = ''; return; }
+                const dataURL = await readFileAsDataURL(f);
+                state.heroImgData = dataURL;
+                $('#lpb-hero-thumb').innerHTML = '<img alt="" src="'+dataURL+'">';
+            });
+
+            // Hero image position
+            $('#lpb-hero-img-pos').addEventListener('change', (e) => {
+                state.heroImgPos = e.target.value;
+            });
+
+            // Sections UI
+            const sectionsEl = $('#lpb-sections');
+
+            function addSection(prefill){
+                const id = crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random());
+                const sec = Object.assign({ id, title:'', text:'', imgData:null, alt:'', imgPos:'right' }, prefill||{});
+                state.sections.push(sec);
+                renderSections();
+            }
+
+            function removeSection(id){
+                const i = state.sections.findIndex(s => s.id === id);
+                if (i >= 0) { state.sections.splice(i,1); renderSections(); }
+            }
+
+            function moveSection(id, dir){
+                const i = state.sections.findIndex(s => s.id === id);
+                if (i < 0) return;
+                const j = i + (dir === 'up' ? -1 : 1);
+                if (j < 0 || j >= state.sections.length) return;
+                [state.sections[i], state.sections[j]] = [state.sections[j], state.sections[i]];
+                renderSections();
+            }
+
+            function renderSections(){
+                sectionsEl.innerHTML = '';
+                state.sections.forEach((sec, idx) => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'lpb-sec';
+                    wrapper.innerHTML = `
+                        <div class="lpb-sec-head">
+                            <strong>Section ${idx+1}</strong>
+                            <div class="lpb-row">
+                                <button class="lpb-btn lpb-move" data-act="up">↑</button>
+                                <button class="lpb-btn lpb-move" data-act="down">↓</button>
+                                <button class="lpb-btn lpb-del" data-act="del">Delete</button>
+                            </div>
+                        </div>
+                        <div class="lpb-row">
+                            <div class="lpb-col">
+                                <label>Section Title</label>
+                                <input type="text" data-key="title" value="${escapeHTML(sec.title)}" placeholder="Features">
+                            </div>
+                            <div class="lpb-col">
+                                <label>Image (optional)</label>
+                                <input type="file" accept="image/*" data-key="img">
+                                <div class="lpb-thumb">${sec.imgData ? `<img alt="" src="${sec.imgData}">` : ''}</div>
+                            </div>
+                        </div>
+                        <div class="lpb-field" style="margin-top:8px">
+                            <label>Image Alt Text</label>
+                            <input type="text" data-key="alt" value="${escapeHTML(sec.alt)}" placeholder="Illustration of feature list">
+                        </div>
+                        <div class="lpb-field" style="margin-top:8px">
+                            <label>Image Position</label>
+                            <select data-key="imgPos">
+                                <option value="right" ${sec.imgPos === 'right' ? 'selected' : ''}>Right of Text</option>
+                                <option value="left" ${sec.imgPos === 'left' ? 'selected' : ''}>Left of Text</option>
+                                <option value="above" ${sec.imgPos === 'above' ? 'selected' : ''}>Above Text</option>
+                                <option value="below" ${sec.imgPos === 'below' ? 'selected' : ''}>Below Text</option>
+                            </select>
+                        </div>
+                        <div class="lpb-field" style="margin-top:8px">
+                            <label>Section Text</label>
+                            <textarea rows="3" data-key="text" placeholder="Describe your product...">${escapeHTML(sec.text)}</textarea>
+                        </div>
+                    `;
+                    sectionsEl.appendChild(wrapper);
+
+                    // Wire inputs
+                    const titleEl = wrapper.querySelector('input[data-key="title"]');
+                    const textEl  = wrapper.querySelector('textarea[data-key="text"]');
+                    const altEl   = wrapper.querySelector('input[data-key="alt"]');
+                    const imgEl   = wrapper.querySelector('input[data-key="img"]');
+                    const imgPosEl = wrapper.querySelector('select[data-key="imgPos"]');
+
+                    titleEl.addEventListener('input', e => sec.title = e.target.value);
+                    textEl.addEventListener('input', e => sec.text  = e.target.value);
+                    altEl.addEventListener('input', e => sec.alt   = e.target.value);
+                    imgPosEl.addEventListener('change', e => sec.imgPos = e.target.value);
+
+                    imgEl.addEventListener('change', async (e) => {
+                        const f = e.target.files && e.target.files[0];
+                        if (!f) return;
+                        if (!/^image\//.test(f.type)) { alert('Please choose an image file.'); e.target.value = ''; return; }
+                        sec.imgData = await readFileAsDataURL(f);
+                        renderSections(); // re-render to show thumb
+                    });
+
+                    wrapper.querySelector('[data-act="del"]').addEventListener('click', () => removeSection(sec.id));
+                    wrapper.querySelector('[data-act="up"]').addEventListener('click', () => moveSection(sec.id,'up'));
+                    wrapper.querySelector('[data-act="down"]').addEventListener('click', () => moveSection(sec.id,'down'));
+                });
+            }
+
+            // Initial one section for friendliness
+            addSection();
+
+            // Add Section button - FIXED: Only add one section
+            $('#lpb-add-section').addEventListener('click', () => addSection());
+
+            // Code generation
+            $('#lpb-generate').addEventListener('click', () => {
+                const siteTitle = $('#lpb-site-title').value.trim() || 'Landing Page';
+                const font = $('#lpb-font').value;
+                const baseSize = parseInt($('#lpb-base-size').value, 10) || 18;
+                const boldHeadings = $('#lpb-bold-headings').checked;
+                const boldBody = $('#lpb-bold-body').checked;
+                const primaryColor = $('#lpb-primary-color').value;
+                const textColor = $('#lpb-text-color').value;
+                const useGradient = $('#lpb-use-gradient').checked;
+
+                const heroH = $('#lpb-hero-heading').value.trim();
+                const heroS = $('#lpb-hero-sub').value.trim();
+                const heroCTA = $('#lpb-hero-cta').value.trim();
+                const heroAlt = $('#lpb-hero-alt').value.trim();
+                const heroImg = state.heroImgData;
+                const heroImgPos = state.heroImgPos;
+
+                // Build sections HTML
+                const sectionsHTML = state.sections.map(s => {
+                    let layoutClass = '';
+                    let gridTemplate = '1fr';
+                    
+                    if (s.imgData) {
+                        switch(s.imgPos) {
+                            case 'right':
+                                layoutClass = 'sec-img-right';
+                                gridTemplate = '2fr 1.2fr';
+                                break;
+                            case 'left':
+                                layoutClass = 'sec-img-left';
+                                gridTemplate = '1.2fr 2fr';
+                                break;
+                            case 'above':
+                                layoutClass = 'sec-img-above';
+                                gridTemplate = '1fr';
+                                break;
+                            case 'below':
+                                layoutClass = 'sec-img-below';
+                                gridTemplate = '1fr';
+                                break;
+                        }
+                    }
+                    
+                    return `
+                    <section class="sec ${layoutClass}">
+                        ${s.title ? `<h2>${escapeHTML(s.title)}</h2>` : ''}
+                        <div class="sec-wrap"${s.imgData ? ` style="grid-template-columns:${gridTemplate}"` : ''}>
+                            ${s.imgData && (s.imgPos === 'left' || s.imgPos === 'above') ? `<figure><img src="${s.imgData}" alt="${escapeHTML(s.alt||'')}"></figure>` : ''}
+                            ${s.text ? `<div class="sec-content"><p>${escapeHTML(s.text).replace(/\n/g,'<br>')}</p></div>` : ''}
+                            ${s.imgData && (s.imgPos === 'right' || s.imgPos === 'below') ? `<figure><img src="${s.imgData}" alt="${escapeHTML(s.alt||'')}"></figure>` : ''}
+                        </div>
+                    </section>
+                `}).join('\n');
+
+                const heroBgStyle = useGradient 
+                    ? `background:linear-gradient(180deg,${adjustColor(primaryColor, 95)},#ffffff)` 
+                    : `background:${adjustColor(primaryColor, 95)}`;
+
+                const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${escapeHTML(siteTitle)}</title>
+<meta name="description" content="${escapeHTML(heroS || siteTitle)}">
+<style>
+:root{--base:${baseSize}px;--primary:${primaryColor};--text:${textColor}}
+html{font-size:var(--base)}
+body{margin:0;font-family:${font};line-height:1.6;color:var(--text);background:#ffffff}
+.container{max-width:1100px;margin:0 auto;padding:24px}
+header.hero{padding:64px 0 40px;${heroBgStyle}}
+.hero h1{font-size:clamp(1.8rem,3vw + 1rem,3rem);margin:0 0 8px;${boldHeadings?'font-weight:800':'font-weight:600'}}
+.hero p{font-size:1.05rem;margin:0 0 18px;${boldBody?'font-weight:600':''};color:${adjustColor(textColor, 30)}}
+.hero .cta{display:inline-block;padding:12px 18px;background:var(--primary);color:#fff;border-radius:999px;text-decoration:none;border:1px solid ${adjustColor(primaryColor, -20)}}
+.hero .media{margin-top:22px}
+.hero img{max-width:100%;height:auto;border-radius:14px;border:1px solid ${adjustColor(textColor, 90)};box-shadow:0 8px 30px rgba(0,0,0,.06)}
+.hero-grid{display:grid;gap:18px;align-items:center}
+.hero-content{order:1}
+.hero-media{order:2}
+.hero-bg{background:linear-gradient(rgba(255,255,255,0.9),rgba(255,255,255,0.9)),url('${heroImg}');background-size:cover;background-position:center}
+.sec{padding:32px 0;border-top:1px solid ${adjustColor(textColor, 95)}}
+.sec h2{font-size:1.5rem;margin:0 0 10px;${boldHeadings?'font-weight:800':'font-weight:700'}}
+.sec-wrap{display:grid;gap:18px;align-items:start}
+.sec p{margin:0;${boldBody?'font-weight:600':''}}
+.sec-img-above .sec-wrap,.sec-img-below .sec-wrap{grid-template-columns:1fr}
+.sec-img-above figure{order:1}
+.sec-img-above .sec-content{order:2}
+.sec-img-below figure{order:2}
+.sec-img-below .sec-content{order:1}
+figure{margin:0}
+figure img{max-width:100%;height:auto;border-radius:12px;border:1px solid ${adjustColor(textColor, 90)}}
+footer{padding:40px 0;border-top:1px solid ${adjustColor(textColor, 95)};color:${adjustColor(textColor, 40)};font-size:.95rem;text-align:center}
+@media (min-width:860px){
+.hero-grid{grid-template-columns:${heroImgPos === 'background' ? '1fr' : heroImg && (heroImgPos === 'left' || heroImgPos === 'right') ? '1fr 1fr' : '1fr'}}
+${heroImgPos === 'left' ? '.hero-content{order:2}.hero-media{order:1}' : ''}
+${heroImgPos === 'background' ? '.hero-bg .hero-content{max-width:700px;margin:0 auto}' : ''}
+.sec-wrap{grid-template-columns:${heroImg && heroImgPos === 'left' ? '1.2fr 2fr' : heroImg && heroImgPos === 'right' ? '2fr 1.2fr' : '1fr'}}
+}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:ital,wght@0,400;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto+Condensed:ital,wght@0,400;0,700;1,400&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:ital,wght@0,400;0,700;1,400&family=Nunito:ital,wght@0,400;0,700;1,400&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Fira+Sans:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,400;0,700;1,400&family=Oswald:wght@400;700&family=Raleway:ital,wght@0,400;0,700;1,400&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Noto+Sans:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+<header class="hero${heroImgPos === 'background' && heroImg ? ' hero-bg' : ''}">
+<div class="container">
+${heroImg && heroImgPos !== 'background' ? `<div class="hero-grid">` : ''}
+${heroImg && heroImgPos === 'left' ? `<div class="hero-media"><img src="${heroImg}" alt="${escapeHTML(heroAlt||'Hero image')}"></div>` : ''}
+<div class="hero-content">
+${heroH ? `<h1>${escapeHTML(heroH)}</h1>` : ''}
+${heroS ? `<p>${escapeHTML(heroS)}</p>` : ''}
+${heroCTA ? `<a class="cta" href="#">${escapeHTML(heroCTA)}</a>` : ''}
+</div>
+${heroImg && heroImgPos === 'right' ? `<div class="hero-media"><img src="${heroImg}" alt="${escapeHTML(heroAlt||'Hero image')}"></div>` : ''}
+${heroImg && heroImgPos !== 'background' ? `</div>` : ''}
+${heroImg && heroImgPos === 'below' ? `<div class="media"><img src="${heroImg}" alt="${escapeHTML(heroAlt||'Hero image')}"></div>` : ''}
+</div>
+</header>
+<main class="container">
+${sectionsHTML || '<!-- Add sections to show content here -->'}
+</main>
+<footer class="container">&copy; ${new Date().getFullYear()} ${escapeHTML(siteTitle)}. All rights reserved.</footer>
+</body>
+</html>`;
+
+                // Show modal with code
+                $('#lpb-output').value = html;
+                $('#lpb-modal').classList.add('show');
+                $('#lpb-modal').setAttribute('aria-hidden','false');
+            });
+
+            // Modal controls
+            $('#lpb-close').addEventListener('click', () => {
+                $('#lpb-modal').classList.remove('show');
+                $('#lpb-modal').setAttribute('aria-hidden','true');
+            });
+            $('.lpb-backdrop').addEventListener('click', () => $('#lpb-close').click());
+
+            // Copy to clipboard
+            $('#lpb-copy').addEventListener('click', async () => {
+                const ta = $('#lpb-output');
+                ta.select(); ta.setSelectionRange(0, ta.value.length);
+                try {
+                    await navigator.clipboard.writeText(ta.value);
+                    const old = $('#lpb-copy').textContent;
+                    $('#lpb-copy').textContent = 'Copied!';
+                    setTimeout(() => $('#lpb-copy').textContent = old, 900);
+                } catch {
+                    document.execCommand('copy');
+                }
+            });
+
+            // Minify code
+            $('#lpb-minify').addEventListener('click', () => {
+                const ta = $('#lpb-output');
+                let code = ta.value;
+                
+                // Basic minification (remove comments, extra whitespace)
+                code = code
+                    .replace(/<!--[\s\S]*?-->/g, '') // Remove HTML comments
+                    .replace(/\s*[\r\n]+\s*/g, '')   // Remove line breaks
+                    .replace(/>\s+</g, '><')         // Remove spaces between tags
+                    .replace(/\s{2,}/g, ' ')         // Collapse multiple spaces
+                    .trim();
+                
+                ta.value = code;
+                $('#lpb-minify').textContent = 'Minified!';
+                setTimeout(() => $('#lpb-minify').textContent = 'Minify', 1500);
+            });
+
+            // Helper function to adjust color lightness
+            function adjustColor(hex, percent) {
+                const num = parseInt(hex.slice(1), 16);
+                const R = (num >> 16) + percent;
+                const G = ((num >> 8) & 0x00FF) + percent;
+                const B = (num & 0x0000FF) + percent;
+                
+                const constrained = (n) => Math.max(0, Math.min(255, n));
+                
+                return `#${((1 << 24) + (constrained(R) << 16) + (constrained(G) << 8) + constrained(B)).toString(16).slice(1)}`;
+            }
+
+        })();
+    </script>
+</body>
+</html>
