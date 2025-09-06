@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landing Page Builder</title>
+    <title>Landing Page Builder - Optimized</title>
     <style>
         /* === Namespaced styles (lpb-*) to avoid conflicts ===================== */
         .lpb { --gap: 12px; --radius: 14px; --shadow: 0 6px 30px rgba(0,0,0,.08); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
@@ -54,6 +54,11 @@
         .lpb-footer-btn:hover { background: #3b5bdb; }
         .lpb-footer-btn.paste { background: #fa5252; }
         .lpb-footer-btn.paste:hover { background: #e03131; }
+        
+        /* Performance optimizations */
+        .lpb-sec-content { transition: opacity 0.2s; }
+        .lpb-loading { opacity: 0.7; pointer-events: none; }
+        
         @media (min-width: 700px) {
             .lpb-field:nth-child(1), .lpb-field:nth-child(2), .lpb-field:nth-child(3) { grid-column: span 6; }
             .lpb-field:nth-child(4) { grid-column: span 12; }
@@ -64,7 +69,7 @@
     <!-- === Landing Page Code Builder (drop-in) ================================ -->
     <section id="lpb-root" class="lpb">
         <div class="lpb-card">
-            <h1 class="lpb-h1">Landing Page Builder</h1>
+            <h1 class="lpb-h1">Landing Page Builder <small style="font-size: 0.7em; color: #4c6ef5;">(Optimized)</small></h1>
 
             <div class="lpb-grid">
                 <div class="lpb-field">
@@ -241,14 +246,38 @@
                 fr.readAsDataURL(file);
             });
 
+            // Debounce function to limit how often a function can fire
+            function debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
             // Hero image upload
             $('#lpb-hero-img').addEventListener('change', async (e) => {
                 const f = e.target.files && e.target.files[0];
                 if (!f) return;
                 if (!/^image\//.test(f.type)) { alert('Please choose an image file.'); e.target.value = ''; return; }
-                const dataURL = await readFileAsDataURL(f);
-                state.heroImgData = dataURL;
-                $('#lpb-hero-thumb').innerHTML = '<img alt="" src="'+dataURL+'">';
+                
+                // Show loading state
+                const thumbContainer = $('#lpb-hero-thumb');
+                thumbContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: #6c757d;">Loading image...</div>';
+                
+                try {
+                    const dataURL = await readFileAsDataURL(f);
+                    state.heroImgData = dataURL;
+                    thumbContainer.innerHTML = '<img alt="" src="'+dataURL+'">';
+                } catch (error) {
+                    alert('Error loading image. Please try another file.');
+                    console.error('Image loading error:', error);
+                    thumbContainer.innerHTML = '';
+                }
             });
 
             // Hero image position
@@ -281,10 +310,16 @@
             }
 
             function renderSections(){
+                // Only re-render if necessary (when sections are added, removed, or reordered)
                 sectionsEl.innerHTML = '';
                 state.sections.forEach((sec, idx) => {
                     const wrapper = document.createElement('div');
                     wrapper.className = 'lpb-sec';
+                    wrapper.setAttribute('data-section-id', sec.id);
+                    
+                    // Only include the image if it exists to prevent data URL bloat
+                    const thumbHTML = sec.imgData ? `<img alt="" src="${sec.imgData}">` : '';
+                    
                     wrapper.innerHTML = `
                         <div class="lpb-sec-head">
                             <strong>Section ${idx+1}</strong>
@@ -294,55 +329,89 @@
                                 <button class="lpb-btn lpb-del" data-act="del">Delete</button>
                             </div>
                         </div>
-                        <div class="lpb-row">
-                            <div class="lpb-col">
-                                <label>Section Title</label>
-                                <input type="text" data-key="title" value="${escapeHTML(sec.title)}" placeholder="Features">
+                        <div class="lpb-sec-content">
+                            <div class="lpb-row">
+                                <div class="lpb-col">
+                                    <label>Section Title</label>
+                                    <input type="text" data-key="title" value="${escapeHTML(sec.title)}" placeholder="Features">
+                                </div>
+                                <div class="lpb-col">
+                                    <label>Image (optional)</label>
+                                    <input type="file" accept="image/*" data-key="img">
+                                    <div class="lpb-thumb">${thumbHTML}</div>
+                                </div>
                             </div>
-                            <div class="lpb-col">
-                                <label>Image (optional)</label>
-                                <input type="file" accept="image/*" data-key="img">
-                                <div class="lpb-thumb">${sec.imgData ? `<img alt="" src="${sec.imgData}">` : ''}</div>
+                            <div class="lpb-field" style="margin-top:8px">
+                                <label>Image Alt Text</label>
+                                <input type="text" data-key="alt" value="${escapeHTML(sec.alt)}" placeholder="Illustration of feature list">
                             </div>
-                        </div>
-                        <div class="lpb-field" style="margin-top:8px">
-                            <label>Image Alt Text</label>
-                            <input type="text" data-key="alt" value="${escapeHTML(sec.alt)}" placeholder="Illustration of feature list">
-                        </div>
-                        <div class="lpb-field" style="margin-top:8px">
-                            <label>Image Position</label>
-                            <select data-key="imgPos">
-                                <option value="right" ${sec.imgPos === 'right' ? 'selected' : ''}>Right of Text</option>
-                                <option value="left" ${sec.imgPos === 'left' ? 'selected' : ''}>Left of Text</option>
-                                <option value="above" ${sec.imgPos === 'above' ? 'selected' : ''}>Above Text</option>
-                                <option value="below" ${sec.imgPos === 'below' ? 'selected' : ''}>Below Text</option>
-                            </select>
-                        </div>
-                        <div class="lpb-field" style="margin-top:8px">
-                            <label>Section Text</label>
-                            <textarea rows="3" data-key="text" placeholder="Describe your product...">${escapeHTML(sec.text)}</textarea>
+                            <div class="lpb-field" style="margin-top:8px">
+                                <label>Image Position</label>
+                                <select data-key="imgPos">
+                                    <option value="right" ${sec.imgPos === 'right' ? 'selected' : ''}>Right of Text</option>
+                                    <option value="left" ${sec.imgPos === 'left' ? 'selected' : ''}>Left of Text</option>
+                                    <option value="above" ${sec.imgPos === 'above' ? 'selected' : ''}>Above Text</option>
+                                    <option value="below" ${sec.imgPos === 'below' ? 'selected' : ''}>Below Text</option>
+                                </select>
+                            </div>
+                            <div class="lpb-field" style="margin-top:8px">
+                                <label>Section Text</label>
+                                <textarea rows="3" data-key="text" placeholder="Describe your product...">${escapeHTML(sec.text)}</textarea>
+                            </div>
                         </div>
                     `;
                     sectionsEl.appendChild(wrapper);
 
-                    // Wire inputs
+                    // Wire inputs with debouncing for better performance
                     const titleEl = wrapper.querySelector('input[data-key="title"]');
                     const textEl  = wrapper.querySelector('textarea[data-key="text"]');
                     const altEl   = wrapper.querySelector('input[data-key="alt"]');
                     const imgEl   = wrapper.querySelector('input[data-key="img"]');
                     const imgPosEl = wrapper.querySelector('select[data-key="imgPos"]');
+                    const contentEl = wrapper.querySelector('.lpb-sec-content');
 
-                    titleEl.addEventListener('input', e => sec.title = e.target.value);
-                    textEl.addEventListener('input', e => sec.text  = e.target.value);
-                    altEl.addEventListener('input', e => sec.alt   = e.target.value);
-                    imgPosEl.addEventListener('change', e => sec.imgPos = e.target.value);
+                    // Debounced input handlers to prevent performance issues
+                    titleEl.addEventListener('input', debounce(e => {
+                        sec.title = e.target.value;
+                    }, 300));
+
+                    textEl.addEventListener('input', debounce(e => {
+                        sec.text = e.target.value;
+                    }, 300));
+
+                    altEl.addEventListener('input', debounce(e => {
+                        sec.alt = e.target.value;
+                    }, 300));
+
+                    imgPosEl.addEventListener('change', e => {
+                        sec.imgPos = e.target.value;
+                    });
 
                     imgEl.addEventListener('change', async (e) => {
                         const f = e.target.files && e.target.files[0];
                         if (!f) return;
-                        if (!/^image\//.test(f.type)) { alert('Please choose an image file.'); e.target.value = ''; return; }
-                        sec.imgData = await readFileAsDataURL(f);
-                        renderSections(); // re-render to show thumb
+                        if (!/^image\//.test(f.type)) { 
+                            alert('Please choose an image file.'); 
+                            e.target.value = ''; 
+                            return; 
+                        }
+                        
+                        // Show loading state
+                        contentEl.classList.add('lpb-loading');
+                        const thumbContainer = wrapper.querySelector('.lpb-thumb');
+                        thumbContainer.innerHTML = '<div style="padding: 10px; text-align: center; color: #6c757d; font-size: 0.9em;">Loading...</div>';
+                        
+                        try {
+                            sec.imgData = await readFileAsDataURL(f);
+                            // Only update the thumbnail, not the entire section
+                            thumbContainer.innerHTML = `<img alt="" src="${sec.imgData}">`;
+                        } catch (error) {
+                            alert('Error loading image. Please try another file.');
+                            console.error('Image loading error:', error);
+                            thumbContainer.innerHTML = '';
+                        } finally {
+                            contentEl.classList.remove('lpb-loading');
+                        }
                     });
 
                     wrapper.querySelector('[data-act="del"]').addEventListener('click', () => removeSection(sec.id));
@@ -354,7 +423,7 @@
             // Initial one section for friendliness
             addSection();
 
-            // Add Section button - FIXED: Only add one section
+            // Add Section button
             $('#lpb-add-section').addEventListener('click', () => addSection());
 
             // Code generation
