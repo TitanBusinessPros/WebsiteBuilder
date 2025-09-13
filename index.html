@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landing Page Builder - Fixed</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@400;700&family=Roboto+Condensed:wght@400;700&family=Open+Sans:wght@400;600;700&family=Lora:wght@400;700&family=Roboto+Mono:wght@400;700&family=Nunito:wght@400;700&family=Merriweather:wght@400;700&family=Fira+Sans:wght@400;700&family=Source+Sans+Pro:wght@400;700&family=Oswald:wght@400;700&family=Raleway:wght@400;700&family=PT+Sans:wght@400;700&family=Noto+Sans:wght@400;700&display=swap">
+    <title>Landing Page Builder - Enhanced</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Playfair+Display:wght@400;700&family=Roboto+Condensed:wght@400;700&family=Lora:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* === Builder Styles === */
         .lpb { 
             --gap: 12px; 
             --radius: 14px; 
             --shadow: 0 6px 30px rgba(0,0,0,.08); 
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; 
+            font-family: 'Open Sans', sans-serif; 
             background: #f5f7fa;
             padding: 20px;
             min-height: 100vh;
@@ -105,8 +105,8 @@
         }
         .lpb-thumb img { 
             display:block; 
-            max-width: 260px; 
-            max-height: 140px; 
+            max-width: 300px; 
+            max-height: 200px; 
             border-radius:10px; 
             border:1px solid #e9ecef; 
             margin-top: 8px;
@@ -164,7 +164,7 @@
         }
         .lpb-sec .lpb-row { flex-wrap: wrap; }
         .lpb-sec .lpb-col { flex:1 1 260px; min-width: 240px; }
-        .lpb-sec .lpb-thumb img { max-width:180px; max-height:120px; }
+        .lpb-sec .lpb-thumb img { max-width:240px; max-height:160px; }
         .lpb-sec-head { 
             display:flex; 
             align-items:center; 
@@ -331,6 +331,15 @@
             max-height: 400px;
             overflow-y: auto;
         }
+        
+        /* Fix for iframe styling */
+        #preview-frame {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+        }
     </style>
 </head>
 <body>
@@ -355,26 +364,12 @@
                 <div class="lpb-field">
                     <label>Base Font</label>
                     <select id="lpb-font">
-                        <option value="system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif">Clean Sans (system)</option>
-                        <option value="Georgia, Times, serif">Serif (Georgia)</option>
-                        <option value="Arial, Helvetica, sans-serif">Arial/Helvetica</option>
-                        <option value="Tahoma, Verdana, sans-serif">Tahoma/Verdana</option>
-                        <option value="'Courier New', Courier, monospace">Monospace</option>
                         <option value="'Poppins', sans-serif" selected>Poppins (Modern)</option>
                         <option value="'Montserrat', sans-serif">Montserrat (Clean)</option>
+                        <option value="'Open Sans', sans-serif">Open Sans (Friendly)</option>
                         <option value="'Playfair Display', serif">Playfair (Elegant)</option>
                         <option value="'Roboto Condensed', sans-serif">Roboto Condensed</option>
-                        <option value="'Open Sans', sans-serif">Open Sans (Friendly)</option>
-                        <option value="'Lora', serif">Lora (Elegant)</option>
-                        <option value="'Roboto Mono', monospace">Roboto Mono (Code)</option>
-                        <option value="'Nunito', sans-serif">Nunito (Rounded)</option>
-                        <option value="'Merriweather', serif">Merriweather (Readable)</option>
-                        <option value="'Fira Sans', sans-serif">Fira Sans (Tech)</option>
-                        <option value="'Source Sans Pro', sans-serif">Source Sans Pro (Clean)</option>
-                        <option value="'Oswald', sans-serif">Oswald (Bold)</option>
-                        <option value="'Raleway', sans-serif">Raleway (Elegant)</option>
-                        <option value="'PT Sans', sans-serif">PT Sans (Neutral)</option>
-                        <option value="'Noto Sans', sans-serif">Noto Sans (Universal)</option>
+                        <option value="'Lora', serif">Lora (Readable)</option>
                     </select>
                 </div>
 
@@ -480,9 +475,7 @@
                     <h3 class="preview-title">Live Preview</h3>
                     <button id="lpb-refresh-preview" class="lpb-btn">Refresh Preview</button>
                 </div>
-                <div class="preview-content" id="preview-content">
-                    <p style="text-align: center; color: #6c757d; padding: 40px;">Preview will appear here after generating code</p>
-                </div>
+                <iframe id="preview-frame" srcdoc="<html><body style='padding: 20px; text-align: center; color: #6c757d;'><p>Preview will appear here after generating code</p></body></html>"></iframe>
             </div>
 
             <div class="lpb-actions">
@@ -528,7 +521,7 @@
                 heroImgData: null,
                 heroImgPos: 'right',
                 heroLink: 'https://example.com',
-                sections: [] // { id, title, text, imgData, alt, imgPos, buttonText, buttonLink }
+                sections: [] // { id, title, text, imgData, alt, imgPos, buttonText, buttonLink, bgColor }
             };
 
             // Helpers
@@ -589,7 +582,17 @@
 
             function addSection(prefill){
                 const id = crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random());
-                const sec = Object.assign({ id, title:'Features', text:'Describe your amazing features here...', imgData:null, alt:'Feature illustration', imgPos:'right', buttonText: 'Learn More', buttonLink: 'https://example.com' }, prefill||{});
+                const sec = Object.assign({ 
+                    id, 
+                    title:'Features', 
+                    text:'Describe your amazing features here...', 
+                    imgData:null, 
+                    alt:'Feature illustration', 
+                    imgPos:'right', 
+                    buttonText: 'Learn More', 
+                    buttonLink: 'https://example.com',
+                    bgColor: '#ffffff'
+                }, prefill||{});
                 state.sections.push(sec);
                 renderSections();
             }
@@ -615,6 +618,7 @@
                     const wrapper = document.createElement('div');
                     wrapper.className = 'lpb-sec';
                     wrapper.setAttribute('data-section-id', sec.id);
+                    wrapper.style.backgroundColor = sec.bgColor || '#fbfcfe';
                     
                     // Only include the image if it exists to prevent data URL bloat
                     const thumbHTML = sec.imgData ? `<img alt="" src="${sec.imgData}">` : '';
@@ -640,9 +644,15 @@
                                     <div class="lpb-thumb">${thumbHTML}</div>
                                 </div>
                             </div>
-                            <div class="lpb-field" style="margin-top:8px">
-                                <label>Image Alt Text</label>
-                                <input type="text" data-key="alt" value="${escapeHTML(sec.alt)}" placeholder="Illustration of feature list">
+                            <div class="lpb-row">
+                                <div class="lpb-field" style="flex: 1;">
+                                    <label>Image Alt Text</label>
+                                    <input type="text" data-key="alt" value="${escapeHTML(sec.alt)}" placeholder="Illustration of feature list">
+                                </div>
+                                <div class="lpb-field" style="flex: 1;">
+                                    <label>Background Color</label>
+                                    <input type="color" data-key="bgColor" value="${sec.bgColor || '#ffffff'}">
+                                </div>
                             </div>
                             <div class="lpb-field" style="margin-top:8px">
                                 <label>Image Position</label>
@@ -679,6 +689,7 @@
                     const imgPosEl = wrapper.querySelector('select[data-key="imgPos"]');
                     const buttonTextEl = wrapper.querySelector('input[data-key="buttonText"]');
                     const buttonLinkEl = wrapper.querySelector('input[data-key="buttonLink"]');
+                    const bgColorEl = wrapper.querySelector('input[data-key="bgColor"]');
                     const contentEl = wrapper.querySelector('.lpb-sec-content');
 
                     // Debounced input handlers to prevent performance issues
@@ -705,6 +716,11 @@
                     buttonLinkEl.addEventListener('input', debounce(e => {
                         sec.buttonLink = e.target.value;
                     }, 300));
+
+                    bgColorEl.addEventListener('input', e => {
+                        sec.bgColor = e.target.value;
+                        wrapper.style.backgroundColor = sec.bgColor;
+                    });
 
                     imgEl.addEventListener('change', async (e) => {
                         const f = e.target.files && e.target.files[0];
@@ -748,29 +764,10 @@
             // Update preview function
             function updatePreview() {
                 const html = generateHTML();
-                const preview = $('#preview-content');
-                preview.innerHTML = html;
+                const previewFrame = document.getElementById('preview-frame');
                 
-                // Extract and apply styles
-                const styleMatch = html.match(/<style>([\s\S]*?)<\/style>/);
-                if (styleMatch && styleMatch[1]) {
-                    const style = document.createElement('style');
-                    style.textContent = styleMatch[1];
-                    preview.appendChild(style);
-                }
-                
-                // Extract and set body content
-                const bodyMatch = html.match(/<body>([\s\S]*?)<\/body>/);
-                if (bodyMatch && bodyMatch[1]) {
-                    preview.innerHTML = bodyMatch[1];
-                    
-                    // Re-add the style
-                    if (styleMatch && styleMatch[1]) {
-                        const style = document.createElement('style');
-                        style.textContent = styleMatch[1];
-                        preview.appendChild(style);
-                    }
-                }
+                // Update the iframe with the generated HTML
+                previewFrame.srcdoc = html;
             }
 
             // Refresh preview button
@@ -822,18 +819,18 @@
                     }
                     
                     // Button HTML if button text is provided
-                    const buttonHTML = s.buttonText ? `<a class="sec-btn" href="${escapeHTML(s.buttonLink)}">${escapeHTML(s.buttonText)}</a>` : '';
+                    const buttonHTML = s.buttonText ? `<a class="sec-btn" href="${s.buttonLink}" target="_blank">${escapeHTML(s.buttonText)}</a>` : '';
                     
                     return `
-                    <section class="sec ${layoutClass}">
+                    <section class="sec ${layoutClass}" style="background-color: ${s.bgColor || '#ffffff'}">
                         ${s.title ? `<h2>${escapeHTML(s.title)}</h2>` : ''}
                         <div class="sec-wrap"${s.imgData ? ` style="grid-template-columns:${gridTemplate}"` : ''}>
-                            ${s.imgData && (s.imgPos === 'left' || s.imgPos === 'above') ? `<figure><img src="${s.imgData}" alt="${escapeHTML(s.alt||'')}"></figure>` : ''}
+                            ${s.imgData && (s.imgPos === 'left' || s.imgPos === 'above') ? `<figure><img src="${s.imgData}" alt="${escapeHTML(s.alt||'')}" class="section-image"></figure>` : ''}
                             <div class="sec-content">
                                 ${s.text ? `<p>${escapeHTML(s.text).replace(/\n/g,'<br>')}</p>` : ''}
                                 ${buttonHTML}
                             </div>
-                            ${s.imgData && (s.imgPos === 'right' || s.imgPos === 'below') ? `<figure><img src="${s.imgData}" alt="${escapeHTML(s.alt||'')}"></figure>` : ''}
+                            ${s.imgData && (s.imgPos === 'right' || s.imgPos === 'below') ? `<figure><img src="${s.imgData}" alt="${escapeHTML(s.alt||'')}" class="section-image"></figure>` : ''}
                         </div>
                     </section>
                 `}).join('\n');
@@ -846,19 +843,10 @@
                 const googleFontsMap = {
                     "'Poppins', sans-serif": "Poppins",
                     "'Montserrat', sans-serif": "Montserrat",
+                    "'Open Sans', sans-serif": "Open+Sans",
                     "'Playfair Display', serif": "Playfair+Display",
                     "'Roboto Condensed', sans-serif": "Roboto+Condensed",
-                    "'Open Sans', sans-serif": "Open+Sans",
-                    "'Lora', serif": "Lora",
-                    "'Roboto Mono', monospace": "Roboto+Mono",
-                    "'Nunito', sans-serif": "Nunito",
-                    "'Merriweather', serif": "Merriweather",
-                    "'Fira Sans', sans-serif": "Fira+Sans",
-                    "'Source Sans Pro', sans-serif": "Source+Sans+Pro",
-                    "'Oswald', sans-serif": "Oswald",
-                    "'Raleway', sans-serif": "Raleway",
-                    "'PT Sans', sans-serif": "PT+Sans",
-                    "'Noto Sans', sans-serif": "Noto+Sans"
+                    "'Lora', serif": "Lora"
                 };
 
                 // Check if selected font is a Google Font
@@ -892,7 +880,7 @@ header.hero{padding:64px 0 40px;${heroBgStyle}}
 .hero-content{order:1}
 .hero-media{order:2}
 .hero-bg{background:linear-gradient(rgba(255,255,255,0.9),rgba(255,255,255,0.9)),url('${heroImg}');background-size:cover;background-position:center}
-.sec{padding:32px 0;border-top:1px solid ${adjustColor(textColor, 95)}}
+.sec{padding:32px 0;}
 .sec h2{font-size:1.5rem;margin:0 0 10px;${boldHeadings?'font-weight:800':'font-weight:700'}}
 .sec-wrap{display:grid;gap:18px;align-items:start}
 .sec p{margin:0 0 16px;${boldBody?'font-weight:600':''}}
@@ -904,7 +892,7 @@ header.hero{padding:64px 0 40px;${heroBgStyle}}
 .sec-img-below figure{order:2}
 .sec-img-below .sec-content{order:1}
 figure{margin:0}
-figure img{max-width:100%;height:auto;border-radius:12px;border:1px solid ${adjustColor(textColor, 90)}}
+.section-image{max-width:100%;height:auto;border-radius:12px;border:1px solid ${adjustColor(textColor, 90)}}
 footer{padding:40px 0;border-top:1px solid ${adjustColor(textColor, 95)};color:${adjustColor(textColor, 40)};font-size:.95rem;text-align:center}
 @media (min-width:860px){
 .hero-grid{grid-template-columns:${heroImgPos === 'background' ? '1fr' : heroImg && (heroImgPos === 'left' || heroImgPos === 'right') ? '1fr 1fr' : '1fr'}}
@@ -918,15 +906,15 @@ ${heroImgPos === 'background' ? '.hero-bg .hero-content{max-width:700px;margin:0
 <header class="hero${heroImgPos === 'background' && heroImg ? ' hero-bg' : ''}">
 <div class="container">
 ${heroImg && heroImgPos !== 'background' ? `<div class="hero-grid">` : ''}
-${heroImg && heroImgPos === 'left' ? `<div class="hero-media"><img src="${heroImg}" alt="${escapeHTML(heroAlt||'Hero image')}"></div>` : ''}
+${heroImg && heroImgPos === 'left' ? `<div class="hero-media"><img src="${heroImg}" alt="${escapeHTML(heroAlt||'Hero image')}" class="hero-image"></div>` : ''}
 <div class="hero-content">
 ${heroH ? `<h1>${escapeHTML(heroH)}</h1>` : ''}
 ${heroS ? `<p>${escapeHTML(heroS)}</p>` : ''}
-${heroCTA ? `<a class="cta" href="${escapeHTML(heroLink)}">${escapeHTML(heroCTA)}</a>` : ''}
+${heroCTA ? `<a class="cta" href="${heroLink}" target="_blank">${escapeHTML(heroCTA)}</a>` : ''}
 </div>
-${heroImg && heroImgPos === 'right' ? `<div class="hero-media"><img src="${heroImg}" alt="${escapeHTML(heroAlt||'Hero image')}"></div>` : ''}
+${heroImg && heroImgPos === 'right' ? `<div class="hero-media"><img src="${heroImg}" alt="${escapeHTML(heroAlt||'Hero image')}" class="hero-image"></div>` : ''}
 ${heroImg && heroImgPos !== 'background' ? `</div>` : ''}
-${heroImg && heroImgPos === 'below' ? `<div class="media"><img src="${heroImg}" alt="${escapeHTML(heroAlt||'Hero image')}"></div>` : ''}
+${heroImg && heroImgPos === 'below' ? `<div class="media"><img src="${heroImg}" alt="${escapeHTML(heroAlt||'Hero image')}" class="hero-image"></div>` : ''}
 </div>
 </header>
 <main class="container">
