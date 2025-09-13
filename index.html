@@ -3,78 +3,353 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landing Page Builder - Optimized</title>
+    <title>Landing Page Builder - Fixed</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@400;700&family=Roboto+Condensed:wght@400;700&family=Open+Sans:wght@400;600;700&family=Lora:wght@400;700&family=Roboto+Mono:wght@400;700&family=Nunito:wght@400;700&family=Merriweather:wght@400;700&family=Fira+Sans:wght@400;700&family=Source+Sans+Pro:wght@400;700&family=Oswald:wght@400;700&family=Raleway:wght@400;700&family=PT+Sans:wght@400;700&family=Noto+Sans:wght@400;700&display=swap">
     <style>
-        /* === Namespaced styles (lpb-*) to avoid conflicts ===================== */
-        .lpb { --gap: 12px; --radius: 14px; --shadow: 0 6px 30px rgba(0,0,0,.08); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-        .lpb * { box-sizing: border-box; }
-        .lpb-card { max-width: 980px; margin: 24px auto; padding: 20px; background:#fff; border:1px solid #e9ecef; border-radius: var(--radius); box-shadow: var(--shadow); }
-        .lpb-h1 { font-size: 1.6rem; margin: 0 0 10px; }
-        .lpb-h2 { font-size: 1.2rem; margin: 10px 0; }
-        .lpb-h3 { font-size: 1rem; margin: 0; }
-        .lpb-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); }
-        .lpb-field { grid-column: span 12; display: flex; flex-direction: column; gap: 6px; }
-        .lpb-field > label { font-weight: 600; }
-        .lpb-field input[type="text"], .lpb-field textarea, .lpb-field select, .lpb-field input[type="color"] {
-            padding: 10px 12px; border:1px solid #cfd4da; border-radius: 10px; font: inherit; background:#fff;
+        /* === Builder Styles === */
+        .lpb { 
+            --gap: 12px; 
+            --radius: 14px; 
+            --shadow: 0 6px 30px rgba(0,0,0,.08); 
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; 
+            background: #f5f7fa;
+            padding: 20px;
+            min-height: 100vh;
         }
-        .lpb-field input[type="color"] { height: 42px; padding: 4px; }
-        .lpb-help { color:#6c757d; }
-        .lpb-row { display:flex; align-items:center; gap:12px; }
+        .lpb * { box-sizing: border-box; }
+        .lpb-card { 
+            max-width: 980px; 
+            margin: 24px auto; 
+            padding: 30px; 
+            background:#fff; 
+            border:1px solid #e9ecef; 
+            border-radius: var(--radius); 
+            box-shadow: var(--shadow); 
+        }
+        .lpb-h1 { 
+            font-size: 1.8rem; 
+            margin: 0 0 15px; 
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .lpb-h1 small {
+            font-size: 0.6em; 
+            color: #4c6ef5; 
+            font-weight: normal;
+        }
+        .lpb-h2 { 
+            font-size: 1.4rem; 
+            margin: 20px 0 15px; 
+            color: #2d3748;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .lpb-h3 { font-size: 1rem; margin: 0; }
+        .lpb-grid { 
+            display: grid; 
+            grid-template-columns: repeat(12, 1fr); 
+            gap: var(--gap); 
+        }
+        .lpb-field { 
+            grid-column: span 12; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+        }
+        .lpb-field > label { 
+            font-weight: 600; 
+            color: #2d3748;
+            font-size: 0.95rem;
+        }
+        .lpb-field input[type="text"], 
+        .lpb-field textarea, 
+        .lpb-field select, 
+        .lpb-field input[type="color"] {
+            padding: 12px 14px; 
+            border: 1px solid #cfd4da; 
+            border-radius: 10px; 
+            font: inherit; 
+            background:#fff;
+            transition: all 0.2s;
+        }
+        .lpb-field input[type="text"]:focus, 
+        .lpb-field textarea:focus, 
+        .lpb-field select:focus {
+            border-color: #4c6ef5;
+            box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.1);
+            outline: none;
+        }
+        .lpb-field input[type="color"] { 
+            height: 42px; 
+            padding: 4px; 
+            cursor: pointer;
+        }
+        .lpb-help { 
+            color:#6c757d; 
+            font-size: 0.85rem;
+        }
+        .lpb-row { 
+            display:flex; 
+            align-items:center; 
+            gap:12px; 
+        }
         .lpb-between { justify-content: space-between; }
-        .lpb-check { display:flex; align-items:center; gap:8px; user-select:none; }
-        .lpb-thumb img { display:block; max-width: 260px; max-height: 140px; border-radius:10px; border:1px solid #e9ecef; }
-        .lpb-hr { border:0; height:1px; background:linear-gradient(90deg,#eee,#ddd,#eee); margin:16px 0; }
-        .lpb-actions { display:flex; justify-content:flex-end; gap:10px; margin-top: 16px; }
-        .lpb-btn { border:1px solid #cfd4da; background:#f8f9fa; padding:10px 14px; border-radius: 999px; cursor:pointer; font-weight:600; }
-        .lpb-btn:hover { background:#eff2f5; }
-        .lpb-btn-primary { border-color:#4c6ef5; background:#4c6ef5; color:#fff; }
-        .lpb-btn-primary:hover { filter: brightness(0.95); }
+        .lpb-check { 
+            display:flex; 
+            align-items:center; 
+            gap:8px; 
+            user-select:none; 
+            font-weight: 500;
+        }
+        .lpb-thumb img { 
+            display:block; 
+            max-width: 260px; 
+            max-height: 140px; 
+            border-radius:10px; 
+            border:1px solid #e9ecef; 
+            margin-top: 8px;
+        }
+        .lpb-hr { 
+            border:0; 
+            height:1px; 
+            background:linear-gradient(90deg,#eee,#ddd,#eee); 
+            margin:24px 0; 
+        }
+        .lpb-actions { 
+            display:flex; 
+            justify-content:flex-end; 
+            gap:10px; 
+            margin-top: 24px; 
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        .lpb-btn { 
+            border:1px solid #cfd4da; 
+            background:#f8f9fa; 
+            padding:12px 20px; 
+            border-radius: 999px; 
+            cursor:pointer; 
+            font-weight:600; 
+            transition: all 0.2s;
+        }
+        .lpb-btn:hover { 
+            background:#eff2f5; 
+            transform: translateY(-2px);
+        }
+        .lpb-btn-primary { 
+            border-color:#4c6ef5; 
+            background:#4c6ef5; 
+            color:#fff; 
+            box-shadow: 0 4px 10px rgba(76, 110, 245, 0.3);
+        }
+        .lpb-btn-primary:hover { 
+            background:#3b5bdb; 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(76, 110, 245, 0.4);
+        }
         .lpb-btn-ghost { background:transparent; }
-        .lpb-sec { padding:12px; border:1px dashed #cfd4da; border-radius: 12px; margin-bottom: 12px; background:#fbfcfe; }
+        .lpb-sec { 
+            padding:20px; 
+            border:1px dashed #cfd4da; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            background:#fbfcfe; 
+            transition: all 0.2s;
+        }
+        .lpb-sec:hover {
+            border-color: #4c6ef5;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
         .lpb-sec .lpb-row { flex-wrap: wrap; }
         .lpb-sec .lpb-col { flex:1 1 260px; min-width: 240px; }
         .lpb-sec .lpb-thumb img { max-width:180px; max-height:120px; }
-        .lpb-sec-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-        .lpb-del { background:#ffe3e3; border-color:#ffa8a8; }
-        .lpb-del:hover { background:#ffc9c9; }
-        .lpb-move { background:#e7f5ff; border-color:#74c0fc; }
-        .lpb-move:hover { background:#d0ebff; }
+        .lpb-sec-head { 
+            display:flex; 
+            align-items:center; 
+            justify-content:space-between; 
+            margin-bottom:15px; 
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .lpb-sec-head strong {
+            font-size: 1.1rem;
+            color: #2d3748;
+        }
+        .lpb-del { 
+            background:#ffe3e3; 
+            border-color:#ffa8a8; 
+            color: #fa5252;
+        }
+        .lpb-del:hover { 
+            background:#ffc9c9; 
+            color: #e03131;
+        }
+        .lpb-move { 
+            background:#e7f5ff; 
+            border-color:#74c0fc; 
+            color: #339af0;
+        }
+        .lpb-move:hover { 
+            background:#d0ebff; 
+            color: #1c7ed6;
+        }
 
         /* Modal */
-        .lpb-modal { position: fixed; inset: 0; display:none; z-index: 9999; }
+        .lpb-modal { 
+            position: fixed; 
+            inset: 0; 
+            display:none; 
+            z-index: 9999; 
+        }
         .lpb-modal.show { display:block; }
-        .lpb-backdrop { position:absolute; inset:0; background:rgba(0,0,0,.35); }
-        .lpb-modal-card { position:relative; z-index:1; max-width: 980px; margin: 5vh auto; background:#fff; border-radius: 16px; box-shadow: var(--shadow); padding: 16px; border:1px solid #e9ecef; }
-        .lpb-modal-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
-        .lpb-output { width:100%; height: 60vh; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; border:1px solid #e1e4e8; border-radius: 10px; padding: 10px; background:#fafbfc; }
-        .lpb-hint { margin-top: 8px; color:#6c757d; font-size:.9rem; }
-        .lpb-copyright { text-align: center; margin-top: 20px; color: #6c757d; font-size: 0.9rem; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 12px; }
-        .lpb-footer-btn { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; background: #4c6ef5; color: white; text-decoration: none; border-radius: 999px; font-size: 0.85rem; font-weight: 500; transition: background 0.2s; }
-        .lpb-footer-btn:hover { background: #3b5bdb; }
-        .lpb-footer-btn.paste { background: #fa5252; }
-        .lpb-footer-btn.paste:hover { background: #e03131; }
+        .lpb-backdrop { 
+            position:absolute; 
+            inset:0; 
+            background:rgba(0,0,0,.5);
+            backdrop-filter: blur(4px);
+        }
+        .lpb-modal-card { 
+            position:relative; 
+            z-index:1; 
+            max-width: 980px; 
+            margin: 5vh auto; 
+            background:#fff; 
+            border-radius: 16px; 
+            box-shadow: var(--shadow); 
+            padding: 24px; 
+            border:1px solid #e9ecef; 
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .lpb-modal-head { 
+            display:flex; 
+            align-items:center; 
+            justify-content:space-between; 
+            gap:12px; 
+            margin-bottom:15px; 
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .lpb-output { 
+            width:100%; 
+            height: 60vh; 
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; 
+            font-size: 13px; 
+            border:1px solid #e1e4e8; 
+            border-radius: 10px; 
+            padding: 15px; 
+            background:#fafbfc; 
+            resize: none;
+            flex-grow: 1;
+        }
+        .lpb-hint { 
+            margin-top: 12px; 
+            color:#6c757d; 
+            font-size:.9rem; 
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .lpb-copyright { 
+            text-align: center; 
+            margin-top: 30px; 
+            color: #6c757d; 
+            font-size: 0.9rem; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            gap: 12px; 
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        .lpb-footer-btn { 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 8px 16px; 
+            background: #4c6ef5; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 999px; 
+            font-size: 0.85rem; 
+            font-weight: 500; 
+            transition: background 0.2s; 
+        }
+        .lpb-footer-btn:hover { 
+            background: #3b5bdb; 
+            transform: translateY(-2px);
+        }
+        .lpb-footer-btn.paste { 
+            background: #fa5252; 
+        }
+        .lpb-footer-btn.paste:hover { 
+            background: #e03131; 
+        }
         
         /* Performance optimizations */
         .lpb-sec-content { transition: opacity 0.2s; }
         .lpb-loading { opacity: 0.7; pointer-events: none; }
         
         @media (min-width: 700px) {
-            .lpb-field:nth-child(1), .lpb-field:nth-child(2), .lpb-field:nth-child(3) { grid-column: span 6; }
+            .lpb-field:nth-child(1), 
+            .lpb-field:nth-child(2), 
+            .lpb-field:nth-child(3) { 
+                grid-column: span 6; 
+            }
             .lpb-field:nth-child(4) { grid-column: span 12; }
+        }
+
+        /* Preview Section */
+        .preview-container {
+            margin-top: 30px;
+            border: 2px dashed #4c6ef5;
+            border-radius: 12px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .preview-title {
+            font-size: 1.2rem;
+            color: #2d3748;
+            margin: 0;
+        }
+        .preview-content {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            background: white;
+            padding: 20px;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
         }
     </style>
 </head>
 <body>
-    <!-- === Landing Page Code Builder (drop-in) ================================ -->
+    <!-- === Landing Page Code Builder === -->
     <section id="lpb-root" class="lpb">
         <div class="lpb-card">
-            <h1 class="lpb-h1">Landing Page Builder <small style="font-size: 0.7em; color: #4c6ef5;">(Six Image Max-Allow 30 Seconds For Code To Appear )</small></h1>
+            <h1 class="lpb-h1">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 18L12 6" stroke="#4c6ef5" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M6 12H18" stroke="#4c6ef5" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Landing Page Builder 
+                <small>(Six Image Max - Allow 30 Seconds For Code To Appear)</small>
+            </h1>
 
             <div class="lpb-grid">
                 <div class="lpb-field">
                     <label>Site Title (for browser tab & SEO)</label>
-                    <input id="lpb-site-title" type="text" placeholder="My Awesome Product">
+                    <input id="lpb-site-title" type="text" placeholder="My Awesome Product" value="My Awesome Product">
                 </div>
 
                 <div class="lpb-field">
@@ -85,21 +360,21 @@
                         <option value="Arial, Helvetica, sans-serif">Arial/Helvetica</option>
                         <option value="Tahoma, Verdana, sans-serif">Tahoma/Verdana</option>
                         <option value="'Courier New', Courier, monospace">Monospace</option>
-                        <option value="'Poppins', sans-serif" data-google="Poppins">Poppins (Modern)</option>
-                        <option value="'Montserrat', sans-serif" data-google="Montserrat">Montserrat (Clean)</option>
-                        <option value="'Playfair Display', serif" data-google="Playfair Display">Playfair (Elegant)</option>
-                        <option value="'Roboto Condensed', sans-serif" data-google="Roboto Condensed">Roboto Condensed</option>
-                        <option value="'Open Sans', sans-serif" data-google="Open Sans">Open Sans (Friendly)</option>
-                        <option value="'Lora', serif" data-google="Lora">Lora (Elegant)</option>
-                        <option value="'Roboto Mono', monospace" data-google="Roboto Mono">Roboto Mono (Code)</option>
-                        <option value="'Nunito', sans-serif" data-google="Nunito">Nunito (Rounded)</option>
-                        <option value="'Merriweather', serif" data-google="Merriweather">Merriweather (Readable)</option>
-                        <option value="'Fira Sans', sans-serif" data-google="Fira Sans">Fira Sans (Tech)</option>
-                        <option value="'Source Sans Pro', sans-serif" data-google="Source Sans Pro">Source Sans Pro (Clean)</option>
-                        <option value="'Oswald', sans-serif" data-google="Oswald">Oswald (Bold)</option>
-                        <option value="'Raleway', sans-serif" data-google="Raleway">Raleway (Elegant)</option>
-                        <option value="'PT Sans', sans-serif" data-google="PT Sans">PT Sans (Neutral)</option>
-                        <option value="'Noto Sans', sans-serif" data-google="Noto Sans">Noto Sans (Universal)</option>
+                        <option value="'Poppins', sans-serif" selected>Poppins (Modern)</option>
+                        <option value="'Montserrat', sans-serif">Montserrat (Clean)</option>
+                        <option value="'Playfair Display', serif">Playfair (Elegant)</option>
+                        <option value="'Roboto Condensed', sans-serif">Roboto Condensed</option>
+                        <option value="'Open Sans', sans-serif">Open Sans (Friendly)</option>
+                        <option value="'Lora', serif">Lora (Elegant)</option>
+                        <option value="'Roboto Mono', monospace">Roboto Mono (Code)</option>
+                        <option value="'Nunito', sans-serif">Nunito (Rounded)</option>
+                        <option value="'Merriweather', serif">Merriweather (Readable)</option>
+                        <option value="'Fira Sans', sans-serif">Fira Sans (Tech)</option>
+                        <option value="'Source Sans Pro', sans-serif">Source Sans Pro (Clean)</option>
+                        <option value="'Oswald', sans-serif">Oswald (Bold)</option>
+                        <option value="'Raleway', sans-serif">Raleway (Elegant)</option>
+                        <option value="'PT Sans', sans-serif">PT Sans (Neutral)</option>
+                        <option value="'Noto Sans', sans-serif">Noto Sans (Universal)</option>
                     </select>
                 </div>
 
@@ -156,19 +431,19 @@
             <div class="lpb-grid">
                 <div class="lpb-field">
                     <label>Hero Heading</label>
-                    <input id="lpb-hero-heading" type="text" placeholder="Build beautiful websites effortlessly">
+                    <input id="lpb-hero-heading" type="text" placeholder="Build beautiful websites effortlessly" value="Build beautiful websites effortlessly">
                 </div>
                 <div class="lpb-field">
                     <label>Hero Subheading</label>
-                    <textarea id="lpb-hero-sub" rows="2" placeholder="A simple template that becomes real HTML in one click."></textarea>
+                    <textarea id="lpb-hero-sub" rows="2" placeholder="A simple template that becomes real HTML in one click.">A simple template that becomes real HTML in one click.</textarea>
                 </div>
                 <div class="lpb-field">
                     <label>Call-To-Action Text</label>
-                    <input id="lpb-hero-cta" type="text" placeholder="Get Started">
+                    <input id="lpb-hero-cta" type="text" placeholder="Get Started" value="Get Started">
                 </div>
                 <div class="lpb-field">
-                    <label>Call-To-Action Link</label>
-                    <input id="lpb-hero-link" type="text" placeholder="https://example.com">
+                    <label>CTA Link URL</label>
+                    <input id="lpb-hero-link" type="text" placeholder="https://example.com" value="https://example.com">
                 </div>
                 <div class="lpb-field">
                     <label>Hero Image (optional)</label>
@@ -178,12 +453,12 @@
                 </div>
                 <div class="lpb-field">
                     <label>Hero Image Alt Text</label>
-                    <input id="lpb-hero-alt" type="text" placeholder="Screenshot of the product">
+                    <input id="lpb-hero-alt" type="text" placeholder="Screenshot of the product" value="App Dashboard">
                 </div>
                 <div class="lpb-field">
                     <label>Hero Image Position</label>
                     <select id="lpb-hero-img-pos">
-                        <option value="right">Right of Text</option>
+                        <option value="right" selected>Right of Text</option>
                         <option value="below">Below Text</option>
                         <option value="left">Left of Text</option>
                         <option value="background">As Background</option>
@@ -195,12 +470,23 @@
 
             <div class="lpb-row lpb-between">
                 <h2 class="lpb-h2">Content Sections</h2>
-                <button id="lpb-add-section" class="lpb-btn">+ Add Section</button>
+                <button id="lpb-add-section" class="lpb-btn lpb-btn-primary">+ Add Section</button>
             </div>
             <div id="lpb-sections"></div>
 
+            <!-- Preview Section -->
+            <div class="preview-container">
+                <div class="preview-header">
+                    <h3 class="preview-title">Live Preview</h3>
+                    <button id="lpb-refresh-preview" class="lpb-btn">Refresh Preview</button>
+                </div>
+                <div class="preview-content" id="preview-content">
+                    <p style="text-align: center; color: #6c757d; padding: 40px;">Preview will appear here after generating code</p>
+                </div>
+            </div>
+
             <div class="lpb-actions">
-                <button id="lpb-generate" class="lpb-btn lpb-btn-primary">Make It Code</button>
+                <button id="lpb-generate" class="lpb-btn lpb-btn-primary">Generate HTML Code</button>
             </div>
             
             <div class="lpb-copyright">
@@ -216,13 +502,16 @@
                 <div class="lpb-modal-head">
                     <h3 id="lpb-modal-title" class="lpb-h3">Your Landing Page HTML</h3>
                     <div class="lpb-modal-actions">
-                        <button id="lpb-copy" class="lpb-btn">Copy</button>
+                        <button id="lpb-copy" class="lpb-btn lpb-btn-primary">Copy Code</button>
                         <button id="lpb-minify" class="lpb-btn">Minify</button>
                         <button id="lpb-close" class="lpb-btn lpb-btn-ghost" aria-label="Close">×</button>
                     </div>
                 </div>
                 <textarea id="lpb-output" class="lpb-output" rows="16" readonly></textarea>
-                <div class="lpb-hint">Tip: Paste this into a new <code>.html</code> file or your existing project.</div>
+                <div class="lpb-hint">
+                    <strong>Tip:</strong> Paste this into a new <code>.html</code> file or your existing project.
+                    The code includes all images as data URLs, so it will work even when offline.
+                </div>
             </div>
             <div class="lpb-backdrop"></div>
         </div>
@@ -238,6 +527,7 @@
             const state = {
                 heroImgData: null,
                 heroImgPos: 'right',
+                heroLink: 'https://example.com',
                 sections: [] // { id, title, text, imgData, alt, imgPos, buttonText, buttonLink }
             };
 
@@ -289,12 +579,17 @@
                 state.heroImgPos = e.target.value;
             });
 
+            // Hero link
+            $('#lpb-hero-link').addEventListener('input', debounce(e => {
+                state.heroLink = e.target.value;
+            }, 300));
+
             // Sections UI
             const sectionsEl = $('#lpb-sections');
 
             function addSection(prefill){
                 const id = crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random());
-                const sec = Object.assign({ id, title:'', text:'', imgData:null, alt:'', imgPos:'right', buttonText: '', buttonLink: '' }, prefill||{});
+                const sec = Object.assign({ id, title:'Features', text:'Describe your amazing features here...', imgData:null, alt:'Feature illustration', imgPos:'right', buttonText: 'Learn More', buttonLink: 'https://example.com' }, prefill||{});
                 state.sections.push(sec);
                 renderSections();
             }
@@ -364,11 +659,11 @@
                             </div>
                             <div class="lpb-row">
                                 <div class="lpb-field" style="flex: 1;">
-                                    <label>Button Text</label>
-                                    <input type="text" data-key="buttonText" value="${escapeHTML(sec.buttonText)}" placeholder="Learn more">
+                                    <label>Button Text (optional)</label>
+                                    <input type="text" data-key="buttonText" value="${escapeHTML(sec.buttonText)}" placeholder="Learn More">
                                 </div>
                                 <div class="lpb-field" style="flex: 2;">
-                                    <label>Button Link</label>
+                                    <label>Button Link URL</label>
                                     <input type="text" data-key="buttonLink" value="${escapeHTML(sec.buttonLink)}" placeholder="https://example.com">
                                 </div>
                             </div>
@@ -450,8 +745,39 @@
             // Add Section button
             $('#lpb-add-section').addEventListener('click', () => addSection());
 
+            // Update preview function
+            function updatePreview() {
+                const html = generateHTML();
+                const preview = $('#preview-content');
+                preview.innerHTML = html;
+                
+                // Extract and apply styles
+                const styleMatch = html.match(/<style>([\s\S]*?)<\/style>/);
+                if (styleMatch && styleMatch[1]) {
+                    const style = document.createElement('style');
+                    style.textContent = styleMatch[1];
+                    preview.appendChild(style);
+                }
+                
+                // Extract and set body content
+                const bodyMatch = html.match(/<body>([\s\S]*?)<\/body>/);
+                if (bodyMatch && bodyMatch[1]) {
+                    preview.innerHTML = bodyMatch[1];
+                    
+                    // Re-add the style
+                    if (styleMatch && styleMatch[1]) {
+                        const style = document.createElement('style');
+                        style.textContent = styleMatch[1];
+                        preview.appendChild(style);
+                    }
+                }
+            }
+
+            // Refresh preview button
+            $('#lpb-refresh-preview').addEventListener('click', updatePreview);
+
             // Code generation
-            $('#lpb-generate').addEventListener('click', () => {
+            function generateHTML() {
                 const siteTitle = $('#lpb-site-title').value.trim() || 'Landing Page';
                 const font = $('#lpb-font').value;
                 const baseSize = parseInt($('#lpb-base-size').value, 10) || 18;
@@ -464,16 +790,10 @@
                 const heroH = $('#lpb-hero-heading').value.trim();
                 const heroS = $('#lpb-hero-sub').value.trim();
                 const heroCTA = $('#lpb-hero-cta').value.trim();
-                const heroLink = $('#lpb-hero-link').value.trim() || '#';
                 const heroAlt = $('#lpb-hero-alt').value.trim();
                 const heroImg = state.heroImgData;
                 const heroImgPos = state.heroImgPos;
-
-                // Get Google Font if needed
-                const fontSelect = $('#lpb-font');
-                const selectedOption = fontSelect.options[fontSelect.selectedIndex];
-                const googleFont = selectedOption.dataset.google;
-                const googleFontLink = googleFont ? `<link href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(googleFont)}:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">` : '';
+                const heroLink = state.heroLink;
 
                 // Build sections HTML
                 const sectionsHTML = state.sections.map(s => {
@@ -501,6 +821,9 @@
                         }
                     }
                     
+                    // Button HTML if button text is provided
+                    const buttonHTML = s.buttonText ? `<a class="sec-btn" href="${escapeHTML(s.buttonLink)}">${escapeHTML(s.buttonText)}</a>` : '';
+                    
                     return `
                     <section class="sec ${layoutClass}">
                         ${s.title ? `<h2>${escapeHTML(s.title)}</h2>` : ''}
@@ -508,7 +831,7 @@
                             ${s.imgData && (s.imgPos === 'left' || s.imgPos === 'above') ? `<figure><img src="${s.imgData}" alt="${escapeHTML(s.alt||'')}"></figure>` : ''}
                             <div class="sec-content">
                                 ${s.text ? `<p>${escapeHTML(s.text).replace(/\n/g,'<br>')}</p>` : ''}
-                                ${s.buttonText ? `<a class="sec-btn" href="${escapeHTML(s.buttonLink || '#')}">${escapeHTML(s.buttonText)}</a>` : ''}
+                                ${buttonHTML}
                             </div>
                             ${s.imgData && (s.imgPos === 'right' || s.imgPos === 'below') ? `<figure><img src="${s.imgData}" alt="${escapeHTML(s.alt||'')}"></figure>` : ''}
                         </div>
@@ -519,7 +842,33 @@
                     ? `background:linear-gradient(180deg,${adjustColor(primaryColor, 95)},#ffffff)` 
                     : `background:${adjustColor(primaryColor, 95)}`;
 
-                const html = `<!DOCTYPE html>
+                // Google Fonts mapping
+                const googleFontsMap = {
+                    "'Poppins', sans-serif": "Poppins",
+                    "'Montserrat', sans-serif": "Montserrat",
+                    "'Playfair Display', serif": "Playfair+Display",
+                    "'Roboto Condensed', sans-serif": "Roboto+Condensed",
+                    "'Open Sans', sans-serif": "Open+Sans",
+                    "'Lora', serif": "Lora",
+                    "'Roboto Mono', monospace": "Roboto+Mono",
+                    "'Nunito', sans-serif": "Nunito",
+                    "'Merriweather', serif": "Merriweather",
+                    "'Fira Sans', sans-serif": "Fira+Sans",
+                    "'Source Sans Pro', sans-serif": "Source+Sans+Pro",
+                    "'Oswald', sans-serif": "Oswald",
+                    "'Raleway', sans-serif": "Raleway",
+                    "'PT Sans', sans-serif": "PT+Sans",
+                    "'Noto Sans', sans-serif": "Noto+Sans"
+                };
+
+                // Check if selected font is a Google Font
+                let googleFontLink = '';
+                if (googleFontsMap[font]) {
+                    const fontName = googleFontsMap[font];
+                    googleFontLink = `<link href="https://fonts.googleapis.com/css2?family=${fontName}:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">`;
+                }
+
+                return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -535,7 +884,8 @@ body{margin:0;font-family:${font};line-height:1.6;color:var(--text);background:#
 header.hero{padding:64px 0 40px;${heroBgStyle}}
 .hero h1{font-size:clamp(1.8rem,3vw + 1rem,3rem);margin:0 0 8px;${boldHeadings?'font-weight:800':'font-weight:600'}}
 .hero p{font-size:1.05rem;margin:0 0 18px;${boldBody?'font-weight:600':''};color:${adjustColor(textColor, 30)}}
-.hero .cta{display:inline-block;padding:12px 18px;background:var(--primary);color:#fff;border-radius:999px;text-decoration:none;border:1px solid ${adjustColor(primaryColor, -20)}}
+.hero .cta{display:inline-block;padding:12px 18px;background:var(--primary);color:#fff;border-radius:999px;text-decoration:none;border:1px solid ${adjustColor(primaryColor, -20)};transition:all 0.2s}
+.hero .cta:hover{background:${adjustColor(primaryColor, -10)};transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.15)}
 .hero .media{margin-top:22px}
 .hero img{max-width:100%;height:auto;border-radius:14px;border:1px solid ${adjustColor(textColor, 90)};box-shadow:0 8px 30px rgba(0,0,0,.06)}
 .hero-grid{display:grid;gap:18px;align-items:center}
@@ -545,8 +895,9 @@ header.hero{padding:64px 0 40px;${heroBgStyle}}
 .sec{padding:32px 0;border-top:1px solid ${adjustColor(textColor, 95)}}
 .sec h2{font-size:1.5rem;margin:0 0 10px;${boldHeadings?'font-weight:800':'font-weight:700'}}
 .sec-wrap{display:grid;gap:18px;align-items:start}
-.sec p{margin:0;${boldBody?'font-weight:600':''}}
-.sec-btn{display:inline-block;padding:10px 16px;background:var(--primary);color:#fff;border-radius:999px;text-decoration:none;border:1px solid ${adjustColor(primaryColor, -20)};margin-top:12px}
+.sec p{margin:0 0 16px;${boldBody?'font-weight:600':''}}
+.sec-btn{display:inline-block;padding:10px 16px;background:var(--primary);color:#fff;border-radius:999px;text-decoration:none;border:1px solid ${adjustColor(primaryColor, -20)};margin-top:8px;transition:all 0.2s}
+.sec-btn:hover{background:${adjustColor(primaryColor, -10)};transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.15)}
 .sec-img-above .sec-wrap,.sec-img-below .sec-wrap{grid-template-columns:1fr}
 .sec-img-above figure{order:1}
 .sec-img-above .sec-content{order:2}
@@ -584,11 +935,18 @@ ${sectionsHTML || '<!-- Add sections to show content here -->'}
 <footer class="container">&copy; ${new Date().getFullYear()} ${escapeHTML(siteTitle)}. All rights reserved.</footer>
 </body>
 </html>`;
+            }
 
+            $('#lpb-generate').addEventListener('click', () => {
+                const html = generateHTML();
+                
                 // Show modal with code
                 $('#lpb-output').value = html;
                 $('#lpb-modal').classList.add('show');
                 $('#lpb-modal').setAttribute('aria-hidden','false');
+                
+                // Update preview
+                updatePreview();
             });
 
             // Modal controls
