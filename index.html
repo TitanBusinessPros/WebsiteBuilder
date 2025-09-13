@@ -85,21 +85,21 @@
                         <option value="Arial, Helvetica, sans-serif">Arial/Helvetica</option>
                         <option value="Tahoma, Verdana, sans-serif">Tahoma/Verdana</option>
                         <option value="'Courier New', Courier, monospace">Monospace</option>
-                        <option value="'Poppins', sans-serif">Poppins (Modern)</option>
-                        <option value="'Montserrat', sans-serif">Montserrat (Clean)</option>
-                        <option value="'Playfair Display', serif">Playfair (Elegant)</option>
-                        <option value="'Roboto Condensed', sans-serif">Roboto Condensed</option>
-                        <option value="'Open Sans', sans-serif">Open Sans (Friendly)</option>
-                        <option value="'Lora', serif">Lora (Elegant)</option>
-                        <option value="'Roboto Mono', monospace">Roboto Mono (Code)</option>
-                        <option value="'Nunito', sans-serif">Nunito (Rounded)</option>
-                        <option value="'Merriweather', serif">Merriweather (Readable)</option>
-                        <option value="'Fira Sans', sans-serif">Fira Sans (Tech)</option>
-                        <option value="'Source Sans Pro', sans-serif">Source Sans Pro (Clean)</option>
-                        <option value="'Oswald', sans-serif">Oswald (Bold)</option>
-                        <option value="'Raleway', sans-serif">Raleway (Elegant)</option>
-                        <option value="'PT Sans', sans-serif">PT Sans (Neutral)</option>
-                        <option value="'Noto Sans', sans-serif">Noto Sans (Universal)</option>
+                        <option value="'Poppins', sans-serif" data-google="Poppins">Poppins (Modern)</option>
+                        <option value="'Montserrat', sans-serif" data-google="Montserrat">Montserrat (Clean)</option>
+                        <option value="'Playfair Display', serif" data-google="Playfair Display">Playfair (Elegant)</option>
+                        <option value="'Roboto Condensed', sans-serif" data-google="Roboto Condensed">Roboto Condensed</option>
+                        <option value="'Open Sans', sans-serif" data-google="Open Sans">Open Sans (Friendly)</option>
+                        <option value="'Lora', serif" data-google="Lora">Lora (Elegant)</option>
+                        <option value="'Roboto Mono', monospace" data-google="Roboto Mono">Roboto Mono (Code)</option>
+                        <option value="'Nunito', sans-serif" data-google="Nunito">Nunito (Rounded)</option>
+                        <option value="'Merriweather', serif" data-google="Merriweather">Merriweather (Readable)</option>
+                        <option value="'Fira Sans', sans-serif" data-google="Fira Sans">Fira Sans (Tech)</option>
+                        <option value="'Source Sans Pro', sans-serif" data-google="Source Sans Pro">Source Sans Pro (Clean)</option>
+                        <option value="'Oswald', sans-serif" data-google="Oswald">Oswald (Bold)</option>
+                        <option value="'Raleway', sans-serif" data-google="Raleway">Raleway (Elegant)</option>
+                        <option value="'PT Sans', sans-serif" data-google="PT Sans">PT Sans (Neutral)</option>
+                        <option value="'Noto Sans', sans-serif" data-google="Noto Sans">Noto Sans (Universal)</option>
                     </select>
                 </div>
 
@@ -165,6 +165,10 @@
                 <div class="lpb-field">
                     <label>Call-To-Action Text</label>
                     <input id="lpb-hero-cta" type="text" placeholder="Get Started">
+                </div>
+                <div class="lpb-field">
+                    <label>Call-To-Action Link</label>
+                    <input id="lpb-hero-link" type="text" placeholder="https://example.com">
                 </div>
                 <div class="lpb-field">
                     <label>Hero Image (optional)</label>
@@ -234,7 +238,7 @@
             const state = {
                 heroImgData: null,
                 heroImgPos: 'right',
-                sections: [] // { id, title, text, imgData, alt, imgPos }
+                sections: [] // { id, title, text, imgData, alt, imgPos, buttonText, buttonLink }
             };
 
             // Helpers
@@ -290,7 +294,7 @@
 
             function addSection(prefill){
                 const id = crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random());
-                const sec = Object.assign({ id, title:'', text:'', imgData:null, alt:'', imgPos:'right' }, prefill||{});
+                const sec = Object.assign({ id, title:'', text:'', imgData:null, alt:'', imgPos:'right', buttonText: '', buttonLink: '' }, prefill||{});
                 state.sections.push(sec);
                 renderSections();
             }
@@ -358,6 +362,16 @@
                                 <label>Section Text</label>
                                 <textarea rows="3" data-key="text" placeholder="Describe your product...">${escapeHTML(sec.text)}</textarea>
                             </div>
+                            <div class="lpb-row">
+                                <div class="lpb-field" style="flex: 1;">
+                                    <label>Button Text</label>
+                                    <input type="text" data-key="buttonText" value="${escapeHTML(sec.buttonText)}" placeholder="Learn more">
+                                </div>
+                                <div class="lpb-field" style="flex: 2;">
+                                    <label>Button Link</label>
+                                    <input type="text" data-key="buttonLink" value="${escapeHTML(sec.buttonLink)}" placeholder="https://example.com">
+                                </div>
+                            </div>
                         </div>
                     `;
                     sectionsEl.appendChild(wrapper);
@@ -368,6 +382,8 @@
                     const altEl   = wrapper.querySelector('input[data-key="alt"]');
                     const imgEl   = wrapper.querySelector('input[data-key="img"]');
                     const imgPosEl = wrapper.querySelector('select[data-key="imgPos"]');
+                    const buttonTextEl = wrapper.querySelector('input[data-key="buttonText"]');
+                    const buttonLinkEl = wrapper.querySelector('input[data-key="buttonLink"]');
                     const contentEl = wrapper.querySelector('.lpb-sec-content');
 
                     // Debounced input handlers to prevent performance issues
@@ -386,6 +402,14 @@
                     imgPosEl.addEventListener('change', e => {
                         sec.imgPos = e.target.value;
                     });
+
+                    buttonTextEl.addEventListener('input', debounce(e => {
+                        sec.buttonText = e.target.value;
+                    }, 300));
+
+                    buttonLinkEl.addEventListener('input', debounce(e => {
+                        sec.buttonLink = e.target.value;
+                    }, 300));
 
                     imgEl.addEventListener('change', async (e) => {
                         const f = e.target.files && e.target.files[0];
@@ -440,9 +464,16 @@
                 const heroH = $('#lpb-hero-heading').value.trim();
                 const heroS = $('#lpb-hero-sub').value.trim();
                 const heroCTA = $('#lpb-hero-cta').value.trim();
+                const heroLink = $('#lpb-hero-link').value.trim() || '#';
                 const heroAlt = $('#lpb-hero-alt').value.trim();
                 const heroImg = state.heroImgData;
                 const heroImgPos = state.heroImgPos;
+
+                // Get Google Font if needed
+                const fontSelect = $('#lpb-font');
+                const selectedOption = fontSelect.options[fontSelect.selectedIndex];
+                const googleFont = selectedOption.dataset.google;
+                const googleFontLink = googleFont ? `<link href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(googleFont)}:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">` : '';
 
                 // Build sections HTML
                 const sectionsHTML = state.sections.map(s => {
@@ -475,7 +506,10 @@
                         ${s.title ? `<h2>${escapeHTML(s.title)}</h2>` : ''}
                         <div class="sec-wrap"${s.imgData ? ` style="grid-template-columns:${gridTemplate}"` : ''}>
                             ${s.imgData && (s.imgPos === 'left' || s.imgPos === 'above') ? `<figure><img src="${s.imgData}" alt="${escapeHTML(s.alt||'')}"></figure>` : ''}
-                            ${s.text ? `<div class="sec-content"><p>${escapeHTML(s.text).replace(/\n/g,'<br>')}</p></div>` : ''}
+                            <div class="sec-content">
+                                ${s.text ? `<p>${escapeHTML(s.text).replace(/\n/g,'<br>')}</p>` : ''}
+                                ${s.buttonText ? `<a class="sec-btn" href="${escapeHTML(s.buttonLink || '#')}">${escapeHTML(s.buttonText)}</a>` : ''}
+                            </div>
                             ${s.imgData && (s.imgPos === 'right' || s.imgPos === 'below') ? `<figure><img src="${s.imgData}" alt="${escapeHTML(s.alt||'')}"></figure>` : ''}
                         </div>
                     </section>
@@ -492,6 +526,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHTML(siteTitle)}</title>
 <meta name="description" content="${escapeHTML(heroS || siteTitle)}">
+${googleFontLink}
 <style>
 :root{--base:${baseSize}px;--primary:${primaryColor};--text:${textColor}}
 html{font-size:var(--base)}
@@ -511,6 +546,7 @@ header.hero{padding:64px 0 40px;${heroBgStyle}}
 .sec h2{font-size:1.5rem;margin:0 0 10px;${boldHeadings?'font-weight:800':'font-weight:700'}}
 .sec-wrap{display:grid;gap:18px;align-items:start}
 .sec p{margin:0;${boldBody?'font-weight:600':''}}
+.sec-btn{display:inline-block;padding:10px 16px;background:var(--primary);color:#fff;border-radius:999px;text-decoration:none;border:1px solid ${adjustColor(primaryColor, -20)};margin-top:12px}
 .sec-img-above .sec-wrap,.sec-img-below .sec-wrap{grid-template-columns:1fr}
 .sec-img-above figure{order:1}
 .sec-img-above .sec-content{order:2}
@@ -526,7 +562,6 @@ ${heroImgPos === 'background' ? '.hero-bg .hero-content{max-width:700px;margin:0
 .sec-wrap{grid-template-columns:${heroImg && heroImgPos === 'left' ? '1.2fr 2fr' : heroImg && heroImgPos === 'right' ? '2fr 1.2fr' : '1fr'}}
 }
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:ital,wght@0,400;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto+Condensed:ital,wght@0,400;0,700;1,400&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:ital,wght@0,400;0,700;1,400&family=Nunito:ital,wght@0,400;0,700;1,400&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Fira+Sans:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,400;0,700;1,400&family=Oswald:wght@400;700&family=Raleway:ital,wght@0,400;0,700;1,400&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Noto+Sans:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
 <header class="hero${heroImgPos === 'background' && heroImg ? ' hero-bg' : ''}">
@@ -536,7 +571,7 @@ ${heroImg && heroImgPos === 'left' ? `<div class="hero-media"><img src="${heroIm
 <div class="hero-content">
 ${heroH ? `<h1>${escapeHTML(heroH)}</h1>` : ''}
 ${heroS ? `<p>${escapeHTML(heroS)}</p>` : ''}
-${heroCTA ? `<a class="cta" href="#">${escapeHTML(heroCTA)}</a>` : ''}
+${heroCTA ? `<a class="cta" href="${escapeHTML(heroLink)}">${escapeHTML(heroCTA)}</a>` : ''}
 </div>
 ${heroImg && heroImgPos === 'right' ? `<div class="hero-media"><img src="${heroImg}" alt="${escapeHTML(heroAlt||'Hero image')}"></div>` : ''}
 ${heroImg && heroImgPos !== 'background' ? `</div>` : ''}
